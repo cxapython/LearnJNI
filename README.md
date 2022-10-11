@@ -1,7 +1,43 @@
 # LearnJNI
 自用JNI项目以及资料
 
-JNI 对引用数据类型的操作
+### 执行环境
+
+Andorid8 
+
+### JNI的命名规则 
+
+
+
+
+
+以demoso1文件夹里的stringFromJNI2方法举例
+
+```c
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_example_demoso1_MainActivity_stringFromJNI(
+        JNIEnv *env,
+        jobject /* this */) 
+```
+
+`extern "C"`JNI函数声明声明代码是用C++语言写的，所以需要添加extern "C"声明；如果源代码是C语言声明，则不需要添加这个声明
+
+`JNIEXPORT` 是宏定义，表示一个函数需要暴露给共享库外部使用时。JNIEXPORT 在 Window 和 Linux 上有不同的定义
+
+`jstring`是返回值类型,没返回值就是void
+
+`Java_com_example_demoso1`是包名
+
+`MainActivity`是类名
+
+`stringFromJNI`是方法名
+
+其中**`JNIExport`**和**`JNICALL`**是不固定保留的关键字不要修改
+
+
+
+###  JNI 对引用数据类型的操作
 
 ### 1.字符串
 
@@ -655,7 +691,9 @@ JNIEnv* env;
 
 
 
+###  推荐资料
 
+https://www.jianshu.com/p/87ce6f565d37
 
 
 
