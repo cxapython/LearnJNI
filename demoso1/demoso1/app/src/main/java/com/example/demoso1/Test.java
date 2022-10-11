@@ -4,17 +4,22 @@ import android.util.Log;
 
 public class Test {
     public String flag = null;
+
     // 构造函数
+    public Test() {
+    }
+
     public Test(String arg) {
-        flag = "Test(String arg)";
+        this.flag = arg;
     }
 
     public Test(String arg, int arg2) {
-        flag = "Test(String arg,int arg2)";
+        this.flag = "Test(String arg,int arg2)";
     }
 
     public static String publicStaticField = "i am a publicStaticField";
-    public String publicField = "im a public Field";
+    public String publicField = "i am a publicField";
+    public int intpublicField = -1234567;
     private static String privateStaticFiled = "i am a privateStaticField";
     private String privateFiled = "i am a privateStaticField";
 

@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 //            //init();
 //
 //        }
-        Log.i("cxaadd", MainActivity.myfirsyjniJNI("fromJava"));
+        Log.i("cxaadd", MainActivity.myfirsyjniJNI("from Java"));
         Log.i("cxaadd", MainActivity.stringFromJNI2());
     }
     public static byte[] b(byte[] bArr) {

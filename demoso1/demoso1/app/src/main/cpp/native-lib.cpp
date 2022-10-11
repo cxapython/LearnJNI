@@ -24,36 +24,7 @@
 
 extern "C" JNIEXPORT jstring JNICALL
 
-//int __fastcall Java_com_example_demoso1_MainActivity_stringFromJNI(_JNIEnv *a1)
-//{
-//    _JNIEnv *v1; // ST34_4
-//    int v2; // ST2C_4
-//    int v3; // ST28_4
-//    int v4; // ST24_4
-//    int v5; // ST20_4
-//    char *v6; // ST08_4
-//    int result; // r0
-//    int v8; // [sp+4h] [bp-4Ch]
-//    char v9; // [sp+38h] [bp-18h]
-//    int v10; // [sp+44h] [bp-Ch]
-//
-//    v1 = a1;
-//    v2 = _JNIEnv::FindClass(a1, "com/example/demoso1/Test");
-//    v3 = _JNIEnv::GetStaticFieldID(v1, v2, "publicStaticField", "Ljava/lang/String;");
-//    v4 = _JNIEnv::GetStaticObjectField(v1, v2, v3);
-//    v5 = _JNIEnv::GetStringUTFChars(v1, v4, 0);
-//    _android_log_print(4, "cxaadd", "now content is: %s", v5);
-//    std::__ndk1::basic_string<char,std::__ndk1::char_traits<char>,std::__ndk1::allocator<char>>::basic_string<decltype(nullptr)>(
-//            &v9,
-//            "Hello from C++");
-//    v6 = (char *)sub_9348(&v9);
-//    v8 = _JNIEnv::NewStringUTF(v1, v6);
-//    std::__ndk1::basic_string<char,std::__ndk1::char_traits<char>,std::__ndk1::allocator<char>>::~basic_string(&v9);
-//    result = _stack_chk_guard;
-//    if ( _stack_chk_guard == v10 )
-//        result = v8;
-//    return result;
-//}
+
 Java_com_example_demoso1_MainActivity_stringFromJNI(
         JNIEnv *env,
         jobject /* this */) {
@@ -61,13 +32,100 @@ Java_com_example_demoso1_MainActivity_stringFromJNI(
     //Native层调用JNI的接口实现反射
     //来获取包com.example.demoso1里Test类的class对象
     jclass testClass = env->FindClass("com/example/demoso1/Test");
-    //参数：java层的类，方法名或者属性名，签名
+    //========调用属性===============
+    //1.调用静态属性
+    //获取Test.java文件的Test类的静态域publicStaticField
+    // 一般先获取id，再进行调用
+    // 参数：java层的类，方法名或者属性名，签名
     jfieldID publicStaticField = env->GetStaticFieldID(testClass, "publicStaticField",
                                                        "Ljava/lang/String;");
     jstring publicStaticField_value = (jstring) env->GetStaticObjectField(testClass,
                                                                           publicStaticField);
+
     const char *value_ptr = env->GetStringUTFChars(publicStaticField_value, nullptr);
-    LOGI("now content is: %s", value_ptr);
+
+
+    LOGI("publicStaticField_value is: %s", value_ptr);
+
+
+    jfieldID privateStaticField = env->GetStaticFieldID(testClass, "privateStaticFiled",
+                                                       "Ljava/lang/String;");
+    jstring privateStaticField_value = (jstring) env->GetStaticObjectField(testClass,
+                                                                           privateStaticField);
+
+    const char *value_ptr11 = env->GetStringUTFChars(privateStaticField_value, nullptr);
+
+
+    LOGI("privateStaticField_value is: %s", value_ptr11);
+    //2.调用非静态属性
+    //获取非静态的就比较麻烦了，需要用到反射
+    //获取构造函数方法名为<init>,()V不参数的构造函数,如果还定义了其他构造函数这个时候默认的构造函数会被覆盖，下面代码会出错，需要自己额外补充一个空的构造函数。
+    jmethodID testContruct = env->GetMethodID(testClass,"<init>","()V");
+    //根据构造函数实例化对象
+    jobject testObject = env->NewObject(testClass,testContruct);
+    jfieldID publicField = env->GetFieldID(testClass, "publicField",
+                                                       "Ljava/lang/String;");
+
+    jstring publicField_value = (jstring) env->GetObjectField(testObject,publicField);
+
+    const char *value_ptr2 = env->GetStringUTFChars(publicField_value, nullptr);
+
+
+    LOGI("publicField_value is: %s", value_ptr2);
+    //调用返回值为其他类型的属性
+    jfieldID intPublicField=env->GetFieldID(testClass,"intpublicField", "I");
+    jint intPublicField_value = env->GetIntField(testObject,intPublicField);
+    LOGI("intpublicField_value is: %d", intPublicField_value);
+    //3.调用私有属性
+    jfieldID  privateFiled = env->GetFieldID(testClass,"privateFiled","Ljava/lang/String;");
+    jstring privateFiled_value = (jstring)env->GetObjectField(testObject,privateFiled);
+    const char *value_ptr3 = env->GetStringUTFChars(privateFiled_value, nullptr);
+    LOGI("privateFiled_value is: %s", value_ptr3);
+
+    env->ReleaseStringUTFChars(publicStaticField_value,value_ptr);
+    env->ReleaseStringUTFChars(publicField_value,value_ptr2);
+    env->ReleaseStringUTFChars(privateFiled_value,value_ptr3);
+
+    //=======方法调用==================
+    //1.调用静态方法
+    //公共方法
+    jmethodID publicStaticFunc = env->GetStaticMethodID(testClass,"publicStaticFunc","()V");
+    env->CallStaticVoidMethod(testClass,publicStaticFunc);
+    //私有方法
+    jmethodID privateStaticFunc = env->GetStaticMethodID(testClass,"privateStaticFunc","()V");
+    env->CallStaticVoidMethod(testClass,privateStaticFunc);
+
+
+    //2.普通方法
+    jmethodID publicFunc = env->GetMethodID(testClass,"publicFunc","()V");
+    env->CallVoidMethod(testObject,publicFunc);
+
+    jmethodID privateFunc = env->GetMethodID(testClass,"privateFunc","()V");
+    env->CallVoidMethod(testObject,privateFunc);
+
+    //调用赋值之前的flag
+    jfieldID flag = env->GetFieldID(testClass,"flag", "Ljava/lang/String;");
+    jstring before_flag_value=(jstring)env->GetObjectField(testObject,flag);
+    LOGI("before_flag_value is: %s", before_flag_value);
+
+    //调用其他构造函数
+    jmethodID testContruct1 = env->GetMethodID(testClass,"<init>","(Ljava/lang/String;)V");
+    std::string flag_value = "set flag value is s";
+    env->CallVoidMethod(testObject,testContruct1,env->NewStringUTF(flag_value.c_str()));
+
+    //调用赋值之后的flag
+    std::string value_ = "再次调用flag";
+    LOGI("after_flag_value is: %s", value_.c_str());
+    jstring after_flag_value=(jstring)env->GetObjectField(testObject,flag);
+    const char *value_ptr4 = env->GetStringUTFChars(after_flag_value, nullptr);
+    LOGI("after_flag_value is: %s", value_ptr4);
+    //手动赋值
+    jstring buffer = env->NewStringUTF("set new flag");
+    (env)->SetObjectField(testObject,flag,buffer);
+
+    jstring set_after_flag_value=(jstring)env->GetObjectField(testObject,flag);
+    const char *value_ptr5 = env->GetStringUTFChars(set_after_flag_value, nullptr);
+    LOGI("set_after_flag_value is: %s", value_ptr5);
 
     std::string hello = "Hello from C++";
     return env->NewStringUTF(hello.c_str());
@@ -125,22 +183,6 @@ void *detect_frida_loop(void *) {
 
 extern "C" JNIEXPORT jstring JNICALL
 
-//反编译之后的代码
-//int __fastcall Java_com_example_demoso1_MainActivity_myfirsyjniJNI(_JNIEnv *a1, int a2, int a3)
-//{
-//    int v4; // [sp+8h] [bp-18h]
-//    int v5; // [sp+Ch] [bp-14h]
-//    _JNIEnv *v6; // [sp+14h] [bp-Ch]
-//
-//    v6 = a1;
-//    v5 = a3;
-//    v4 = _JNIEnv::GetStringUTFChars(a1, a3, 0);
-//    _JNIEnv::GetStringUTFLength(v6, v5);
-//    if ( v4 )
-//        _android_log_print(4, "cxaadd", "now a is %s", v4);
-//    _JNIEnv::ReleaseStringUTFChars(v6, v5, v4);
-//    return _JNIEnv::NewStringUTF(v6, "Hello I'm from myfirstjni");
-//}
 
 Java_com_example_demoso1_MainActivity_myfirsyjniJNI(JNIEnv *env, jclass MainActivity,
                                                     jstring content) {
