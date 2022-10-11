@@ -6,9 +6,10 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+
 #define APPNAME "FridaDetectionTest"
 
-#define TAG "cxaadd"
+#define TAG "CXADemoso1"
 
 // 定义info信息
 
@@ -49,7 +50,7 @@ Java_com_example_demoso1_MainActivity_stringFromJNI(
 
 
     jfieldID privateStaticField = env->GetStaticFieldID(testClass, "privateStaticFiled",
-                                                       "Ljava/lang/String;");
+                                                        "Ljava/lang/String;");
     jstring privateStaticField_value = (jstring) env->GetStaticObjectField(testClass,
                                                                            privateStaticField);
 
@@ -60,76 +61,77 @@ Java_com_example_demoso1_MainActivity_stringFromJNI(
     //2.调用非静态属性
     //获取非静态的就比较麻烦了，需要用到反射
     //获取构造函数方法名为<init>,()V不参数的构造函数,如果还定义了其他构造函数这个时候默认的构造函数会被覆盖，下面代码会出错，需要自己额外补充一个空的构造函数。
-    jmethodID testContruct = env->GetMethodID(testClass,"<init>","()V");
+    jmethodID testContruct = env->GetMethodID(testClass, "<init>", "()V");
     //根据构造函数实例化对象
-    jobject testObject = env->NewObject(testClass,testContruct);
+    jobject testObject = env->NewObject(testClass, testContruct);
     jfieldID publicField = env->GetFieldID(testClass, "publicField",
-                                                       "Ljava/lang/String;");
+                                           "Ljava/lang/String;");
 
-    jstring publicField_value = (jstring) env->GetObjectField(testObject,publicField);
+    jstring publicField_value = (jstring) env->GetObjectField(testObject, publicField);
 
     const char *value_ptr2 = env->GetStringUTFChars(publicField_value, nullptr);
 
 
     LOGI("publicField_value is: %s", value_ptr2);
     //调用返回值为其他类型的属性
-    jfieldID intPublicField=env->GetFieldID(testClass,"intpublicField", "I");
-    jint intPublicField_value = env->GetIntField(testObject,intPublicField);
+    jfieldID intPublicField = env->GetFieldID(testClass, "intpublicField", "I");
+    jint intPublicField_value = env->GetIntField(testObject, intPublicField);
     LOGI("intpublicField_value is: %d", intPublicField_value);
     //3.调用私有属性
-    jfieldID  privateFiled = env->GetFieldID(testClass,"privateFiled","Ljava/lang/String;");
-    jstring privateFiled_value = (jstring)env->GetObjectField(testObject,privateFiled);
+    jfieldID privateFiled = env->GetFieldID(testClass, "privateFiled", "Ljava/lang/String;");
+    jstring privateFiled_value = (jstring) env->GetObjectField(testObject, privateFiled);
     const char *value_ptr3 = env->GetStringUTFChars(privateFiled_value, nullptr);
     LOGI("privateFiled_value is: %s", value_ptr3);
 
-    env->ReleaseStringUTFChars(publicStaticField_value,value_ptr);
-    env->ReleaseStringUTFChars(publicField_value,value_ptr2);
-    env->ReleaseStringUTFChars(privateFiled_value,value_ptr3);
+    env->ReleaseStringUTFChars(publicStaticField_value, value_ptr);
+    env->ReleaseStringUTFChars(publicField_value, value_ptr2);
+    env->ReleaseStringUTFChars(privateFiled_value, value_ptr3);
 
     //=======方法调用==================
     //1.调用静态方法
     //公共方法
-    jmethodID publicStaticFunc = env->GetStaticMethodID(testClass,"publicStaticFunc","()V");
-    env->CallStaticVoidMethod(testClass,publicStaticFunc);
+    jmethodID publicStaticFunc = env->GetStaticMethodID(testClass, "publicStaticFunc", "()V");
+    env->CallStaticVoidMethod(testClass, publicStaticFunc);
     //私有方法
-    jmethodID privateStaticFunc = env->GetStaticMethodID(testClass,"privateStaticFunc","()V");
-    env->CallStaticVoidMethod(testClass,privateStaticFunc);
+    jmethodID privateStaticFunc = env->GetStaticMethodID(testClass, "privateStaticFunc", "()V");
+    env->CallStaticVoidMethod(testClass, privateStaticFunc);
 
 
     //2.普通方法
-    jmethodID publicFunc = env->GetMethodID(testClass,"publicFunc","()V");
-    env->CallVoidMethod(testObject,publicFunc);
+    jmethodID publicFunc = env->GetMethodID(testClass, "publicFunc", "()V");
+    env->CallVoidMethod(testObject, publicFunc);
 
-    jmethodID privateFunc = env->GetMethodID(testClass,"privateFunc","()V");
-    env->CallVoidMethod(testObject,privateFunc);
+    jmethodID privateFunc = env->GetMethodID(testClass, "privateFunc", "()V");
+    env->CallVoidMethod(testObject, privateFunc);
 
     //调用赋值之前的flag
-    jfieldID flag = env->GetFieldID(testClass,"flag", "Ljava/lang/String;");
-    jstring before_flag_value=(jstring)env->GetObjectField(testObject,flag);
+    jfieldID flag = env->GetFieldID(testClass, "flag", "Ljava/lang/String;");
+    jstring before_flag_value = (jstring) env->GetObjectField(testObject, flag);
     LOGI("before_flag_value is: %s", before_flag_value);
 
     //调用其他构造函数
-    jmethodID testContruct1 = env->GetMethodID(testClass,"<init>","(Ljava/lang/String;)V");
+    jmethodID testContruct1 = env->GetMethodID(testClass, "<init>", "(Ljava/lang/String;)V");
     std::string flag_value = "set flag value is s";
-    env->CallVoidMethod(testObject,testContruct1,env->NewStringUTF(flag_value.c_str()));
+    env->CallVoidMethod(testObject, testContruct1, env->NewStringUTF(flag_value.c_str()));
 
     //调用赋值之后的flag
     std::string value_ = "再次调用flag";
     LOGI("after_flag_value is: %s", value_.c_str());
-    jstring after_flag_value=(jstring)env->GetObjectField(testObject,flag);
+    jstring after_flag_value = (jstring) env->GetObjectField(testObject, flag);
     const char *value_ptr4 = env->GetStringUTFChars(after_flag_value, nullptr);
     LOGI("after_flag_value is: %s", value_ptr4);
     //手动赋值
     jstring buffer = env->NewStringUTF("set new flag");
-    (env)->SetObjectField(testObject,flag,buffer);
+    (env)->SetObjectField(testObject, flag, buffer);
 
-    jstring set_after_flag_value=(jstring)env->GetObjectField(testObject,flag);
+    jstring set_after_flag_value = (jstring) env->GetObjectField(testObject, flag);
     const char *value_ptr5 = env->GetStringUTFChars(set_after_flag_value, nullptr);
     LOGI("set_after_flag_value is: %s", value_ptr5);
 
     std::string hello = "Hello from C++";
     return env->NewStringUTF(hello.c_str());
 }
+
 
 void *detect_frida_loop(void *) {
     struct sockaddr_in sa;
@@ -140,25 +142,26 @@ void *detect_frida_loop(void *) {
     int i;
     int ret;
     char res[7];
-    while(1){
+    while (1) {
         /*
          * 1:Frida Server Detection
          */
         //LOGI("entering frida server detect loop started");
-        for(i=20000;i<30000;i++){
-            sock = socket(AF_INET,SOCK_STREAM,0);
+        for (i = 20000; i < 30000; i++) {
+            sock = socket(AF_INET, SOCK_STREAM, 0);
             sa.sin_port = htons(i);
-            LOGI("entering frida server detect loop started,now i is %d",i);
+            LOGI("entering frida server detect loop started,now i is %d", i);
 
-            if (connect(sock , (struct sockaddr*)&sa , sizeof sa) != -1) {
-                memset(res, 0 , 7);
+            if (connect(sock, (struct sockaddr *) &sa, sizeof sa) != -1) {
+                memset(res, 0, 7);
                 send(sock, "\x00", 1, NULL);
                 send(sock, "AUTH\r\n", 6, NULL);
                 usleep(500); // Give it some time to answer
                 if ((ret = recv(sock, res, 6, MSG_DONTWAIT)) != -1) {
                     if (strcmp(res, "REJECT") == 0) {
-                        LOGI("FOUND FRIDA SERVER: %s,FRIDA DETECTED [1] - frida server running on port %d!",APPNAME,i);
-                    }else{
+                        LOGI("FOUND FRIDA SERVER: %s,FRIDA DETECTED [1] - frida server running on port %d!",
+                             APPNAME, i);
+                    } else {
                         LOGI("not FOUND FRIDA SERVER");
                     }
                 }
@@ -181,9 +184,8 @@ void *detect_frida_loop(void *) {
 //}
 
 
-extern "C" JNIEXPORT jstring JNICALL
-
-
+extern "C"
+JNIEXPORT jstring JNICALL
 Java_com_example_demoso1_MainActivity_myfirsyjniJNI(JNIEnv *env, jclass MainActivity,
                                                     jstring content) {
     const char *a = env->GetStringUTFChars(content, nullptr);
@@ -198,6 +200,33 @@ Java_com_example_demoso1_MainActivity_myfirsyjniJNI(JNIEnv *env, jclass MainActi
     return result;
 }
 
+extern "C" JNIEXPORT jdoubleArray JNICALL Java_com_example_demoso1_MainActivity_myArray(JNIEnv *env, jobject obj, jintArray jnumbers) {
+
+    //获取指向Java数组元素的直接指针
+    jint *numbers = env->GetIntArrayElements(jnumbers, nullptr);
+    if (numbers == nullptr) {
+        return nullptr;
+    }
+    jsize length = env->GetArrayLength(jnumbers); //获取数组长度
+    LOGI("jarray length is: %d", length);
+    jint sum = 0;
+    for (int i = 0; i < length; i++) {
+        sum += numbers[i];
+    }
+    jdouble average = (jdouble) sum / length;
+    //用完应立即释放防止内存溢出和GetIntArrayElements成对出现
+    env->ReleaseIntArrayElements(jnumbers, numbers, 0);
+    jdouble results[] = {(jdouble) sum, average};
+
+    //新的数组创建
+    jdoubleArray resultArray = env->NewDoubleArray(2);
+    if (resultArray == nullptr) {
+        return nullptr;
+    }
+    //C修改数组然后传给Java。
+    env->SetDoubleArrayRegion(resultArray, 0, 2, results);
+    return resultArray;
+}
 
 
 JNIEXPORT jstring JNICALL stringFromJNI2(
@@ -208,7 +237,7 @@ JNIEXPORT jstring JNICALL stringFromJNI2(
     return env->NewStringUTF(hello.c_str());
 }
 
-JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved){
+JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
     vm->GetEnv((void **) &env, JNI_VERSION_1_6);
     jclass clazz;

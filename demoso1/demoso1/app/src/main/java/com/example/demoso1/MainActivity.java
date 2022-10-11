@@ -13,6 +13,8 @@ import java.lang.reflect.Method;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "CXADemoso1";
+
     // Used to load the 'native-lib' library on application startup.
     static {
         System.loadLibrary("native-lib");
@@ -48,9 +50,19 @@ public class MainActivity extends AppCompatActivity {
 //            //init();
 //
 //        }
-        Log.i("cxaadd", MainActivity.myfirsyjniJNI("from Java"));
-        Log.i("cxaadd", MainActivity.stringFromJNI2());
+        Log.i(TAG, MainActivity.myfirsyjniJNI("from Java"));
+        Log.i(TAG, MainActivity.stringFromJNI2());
+        Log.i(TAG, "start jarray");
+        int[] numbers = {1, 2, 3, 4, 5, 6};
+        double[] result = this.myArray(numbers);
+        Log.i(TAG,"The sum is: " + result[0]);
+        Log.i(TAG,"The average is: " + result[1]);
+        Log.i(TAG, "end jarray");
+
+
+
     }
+
     public static byte[] b(byte[] bArr) {
         return Base64.encode(bArr, 2);
     }
@@ -146,6 +158,8 @@ public class MainActivity extends AppCompatActivity {
     public static native String stringFromJNI2();
 
     public static native String myfirsyjniJNI(String context);
+
+    public  native double[] myArray(int[] numbers);
 //主要是反frida，ptrace形式
 //    public native int init();
 
