@@ -236,23 +236,42 @@ JNIEXPORT jstring JNICALL stringFromJNI2(
     std::string hello = "Hello from C++ stringFromJNI2";
     return env->NewStringUTF(hello.c_str());
 }
+JNIEXPORT jobject JNICALL callConstructor(JNIEnv *env, jobject thiz){
+    jclass clazz=env->GetObjectClass(thiz);
+    jmethodID jmethodId = env->GetMethodID(clazz,"<init>", "(J)V");
+    jlong jlong1 =  10086;
+    jobject ins=env->NewObject(clazz,jmethodId,jlong1);
+    return ins;
+}
 
 JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
     vm->GetEnv((void **) &env, JNI_VERSION_1_6);
     jclass clazz;
 
-    //JNI允许我们提供一个函数映射表，注册给Java虚拟机，这样JVM就可以用函数映射表来调用相应的函数。这样就可以不必通过函数名来查找需要调用的函数了
-    //Java与JNI通过JNINativeMethod的结构来建立联系，它被定义在jni.h中
-//    第一个变量name，代表的是Java中的函数名
-//    第二个变量signature，代表的是Java中的参数和返回值
-//    第三个变量fnPtr，代表的是的指向C函数的函数指针
+/**
+ 动态注册
+JavaVM一个虚拟机只有一个javaVM，该进程的所有线程都可以使用它。
+JNIEnv指针只在创建它的线程中失效，不能跨线程传递。因为JNIenv是独立的
+JNI允许我们提供一个函数映射表，注册给Java虚拟机，这样JVM就可以用函数映射表来调用相应的函数。这样就可以不必通过函数名来查找需要调用的函数了
+ Java与JNI通过JNINativeMethod的结构来建立联系，它被定义在jni.h中
+    第一个变量name，代表的是Java中的函数名
+    第二个变量signature，代表的是Java中的参数和返回值
+    第三个变量fnPtr，代表的是的指向C函数的函数指针
+
+     typedef struct {
+        const char* name; //Java 方法的名字
+        const char* signature; //Java 方法的签名信息
+        void* fnPtr; //JNI 中对应的方法指针
+    } JNINativeMethod;
+ * */
     JNINativeMethod methods[] = {
             {"stringFromJNI2", "()Ljava/lang/String;", (void *) stringFromJNI2},
+            {"callConstructor", "()Ljava/lang/Object;",(void *)callConstructor}
     };
     //找到声明native方法的类
     clazz = env->FindClass("com/example/demoso1/MainActivity");
     //RegisterNatives将注册函数的Java类，以及注册函数的数组，以及个数注册在一起，这样就实现了绑定。
-    env->RegisterNatives(clazz, methods, 1);
+    env->RegisterNatives(clazz, methods, 2);
     return JNI_VERSION_1_6;
 }

@@ -5,21 +5,34 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "CXADemoso1";
+    public  long nativeRef;
 
     // Used to load the 'native-lib' library on application startup.
     static {
         System.loadLibrary("native-lib");
     }
+    public Button callObjectBtn;
+    public MainActivity(){
 
+    }
+    MainActivity(long j){
+        if(j!=0){
+            this.nativeRef=j;
+        }
+
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
         // Example of a call to a native method
         TextView tv = findViewById(R.id.sample_text);
         tv.setText(stringFromJNI());
+
+        callObjectBtn=findViewById(R.id.callObj);
 //        Log.i("cxaadd", MainActivity.myfirsyjniJNI("from java"));
 //        try {
 //            testField();
@@ -58,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         Log.i(TAG,"The sum is: " + result[0]);
         Log.i(TAG,"The average is: " + result[1]);
         Log.i(TAG, "end jarray");
+        callObjectBtn.setOnClickListener(this);
 
 
 
@@ -160,6 +176,21 @@ public class MainActivity extends AppCompatActivity {
     public static native String myfirsyjniJNI(String context);
 
     public  native double[] myArray(int[] numbers);
+
+    public native Object callConstructor();
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.callObj:
+                MainActivity ins = (MainActivity) callConstructor();
+                Log.d("demoso1",String.format("调用nativeRef:%s",ins.nativeRef));
+                break;
+            default:
+                break;
+        }
+
+    }
 //主要是反frida，ptrace形式
 //    public native int init();
 
